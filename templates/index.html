@@ -124,6 +124,81 @@
             color: #6c757d;
             font-size: 0.85rem;
         }
+
+        .about-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-top: 4px solid var(--ojk-blue);
+        }
+
+        .about-section h5 {
+            color: var(--ojk-blue);
+            font-weight: 700;
+        }
+
+        .about-section p {
+            color: #4a5568;
+            line-height: 1.75;
+            margin-bottom: 0.75rem;
+        }
+
+        .about-section .step-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+        }
+
+        .about-section .step-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 8px 0;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .step-number {
+            background: var(--ojk-light);
+            color: var(--ojk-blue);
+            font-weight: 700;
+            font-size: 0.8rem;
+            min-width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .collapse-toggle {
+            color: var(--ojk-blue);
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .collapse-toggle:hover {
+            opacity: 0.75;
+        }
+
+        .collapse-toggle .arrow {
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+
+        .collapse-toggle[aria-expanded="true"] .arrow {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
@@ -144,6 +219,65 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
+
+                <!-- About Section -->
+                <div class="about-section">
+                    <h5 class="mb-3">Tentang Sistem Ini</h5>
+                    <p>
+                        Otoritas Jasa Keuangan (OJK) memiliki banyak peraturan yang masing-masing
+                        ditangani oleh departemen yang berbeda. Sistem ini membantu menentukan
+                        <strong>departemen mana yang paling relevan</strong> untuk menangani suatu
+                        peraturan atau pengaduan, cukup berdasarkan isi teksnya.
+                    </p>
+                    <p>
+                        Cara kerjanya sederhana: masukkan teks peraturan atau deskripsi permasalahan
+                        ke kolom di bawah, lalu sistem akan menganalisis isi teks tersebut dan
+                        memprediksi departemen yang sesuai dari 6 departemen utama OJK.
+                    </p>
+
+                    <a class="collapse-toggle" data-bs-toggle="collapse" href="#aboutDetail"
+                       role="button" aria-expanded="false" aria-controls="aboutDetail">
+                        Lihat selengkapnya <span class="arrow">&#9660;</span>
+                    </a>
+
+                    <div class="collapse" id="aboutDetail">
+                        <ul class="step-list">
+                            <li>
+                                <span class="step-number">1</span>
+                                <span>
+                                    <strong>Pengumpulan Data</strong> &mdash;
+                                    43 dokumen Peraturan OJK (POJK) diekstrak teksnya dari file PDF
+                                    menggunakan teknik text extraction.
+                                </span>
+                            </li>
+                            <li>
+                                <span class="step-number">2</span>
+                                <span>
+                                    <strong>Pelabelan</strong> &mdash;
+                                    Setiap dokumen diberi label departemen berdasarkan kata kunci yang
+                                    terkandung di dalamnya, mengacu pada struktur organisasi OJK.
+                                </span>
+                            </li>
+                            <li>
+                                <span class="step-number">3</span>
+                                <span>
+                                    <strong>Pelatihan Model</strong> &mdash;
+                                    Teks diubah menjadi representasi numerik menggunakan TF-IDF, lalu
+                                    dilatih dengan algoritma Multinomial Naive Bayes agar bisa mengenali
+                                    pola bahasa di masing-masing departemen.
+                                </span>
+                            </li>
+                            <li>
+                                <span class="step-number">4</span>
+                                <span>
+                                    <strong>Prediksi</strong> &mdash;
+                                    Ketika teks baru dimasukkan, model akan mencocokkan pola bahasanya
+                                    dan memberikan hasil prediksi departemen beserta tingkat keyakinannya.
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
                 <!-- Form Card -->
                 <div class="card card-form mb-4">
