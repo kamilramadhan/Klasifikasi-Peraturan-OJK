@@ -1,6 +1,6 @@
 # Klasifikasi Peraturan OJK
 
-Sistem klasifikasi otomatis untuk mengelompokkan Peraturan Otoritas Jasa Keuangan (POJK) ke dalam departemen pengawasan yang sesuai. Dibangun menggunakan pendekatan Natural Language Processing dengan pipeline TF-IDF dan SGD Classifier.
+Sistem klasifikasi otomatis untuk mengelompokkan Peraturan Otoritas Jasa Keuangan (POJK) ke dalam departemen pengawasan yang sesuai berdasarkan isi dokumen. Dibangun menggunakan pendekatan NLP dengan pipeline TF-IDF dan Multinomial Naive Bayes.
 
 Demo: [klasifikasi-peraturan-ojk.vercel.app](https://klasifikasi-peraturan-ojk.vercel.app)
 
@@ -8,16 +8,18 @@ Demo: [klasifikasi-peraturan-ojk.vercel.app](https://klasifikasi-peraturan-ojk.v
 
 ## Latar Belakang
 
-OJK memiliki empat departemen pengawasan utama yang masing-masing menangani bidang regulasi berbeda:
+Berdasarkan Struktur Organisasi OJK-Wide (Eksisting), terdapat enam bidang pengawasan utama di bawah Dewan Komisioner:
 
-| Departemen | Cakupan |
-|---|---|
-| **Perbankan** | Bank umum, BPR, bank syariah, unit usaha syariah |
-| **Pasar Modal** | Saham, obligasi, reksa dana, perusahaan efek, emiten |
-| **IKNB** | Asuransi, dana pensiun, lembaga pembiayaan, penjaminan |
-| **ITSK** | Fintech, inovasi teknologi keuangan, layanan digital |
+| Kode Bidang | Departemen | Cakupan |
+|---|---|---|
+| Bidang 3 | **Perbankan** | Bank umum, BPR, BPRS, bank syariah, unit usaha syariah |
+| Bidang 4 | **Pasar Modal** | Efek, reksa dana, manajer investasi, emiten, keuangan derivatif, bursa karbon |
+| Bidang 5 | **Perasuransian** | Perusahaan asuransi, reasuransi, penjaminan, dana pensiun |
+| Bidang 6 | **Lembaga Pembiayaan** | Perusahaan pembiayaan, modal ventura, LKM, LJK lainnya |
+| Bidang 7 | **ITSK** | Inovasi teknologi sektor keuangan, aset keuangan digital, aset kripto |
+| Bidang 8 | **PPEP** | Perilaku pelaku usaha jasa keuangan, edukasi, pelindungan konsumen |
 
-Pengelompokan peraturan secara manual memakan waktu. Project ini mengotomasi proses tersebut menggunakan machine learning berbasis teks regulasi.
+Mengelompokkan peraturan secara manual ke departemen yang tepat membutuhkan waktu dan pemahaman konteks setiap regulasi. Project ini mengotomasi proses tersebut menggunakan machine learning berbasis teks.
 
 ## Arsitektur
 
@@ -37,7 +39,7 @@ classify_department.py      # Pelabelan awal berbasis keyword matching
 output_pojk_classified.csv  # Dataset berlabel (filename, content, department)
     |
     v
-train_model.py              # Training model TF-IDF + SGD Classifier
+train_model.py              # Training model TF-IDF + Multinomial NB
     |
     v
 model_klasifikasi_ojk.joblib  # Model tersimpan
@@ -74,29 +76,19 @@ Teks dari setiap dokumen PDF diekstrak menggunakan pdfplumber, lalu dibersihkan 
 
 ### Pelabelan
 
-Pelabelan awal dilakukan secara rule-based menggunakan keyword matching. Setiap departemen memiliki daftar kata kunci. Dokumen diklasifikasikan berdasarkan frekuensi kemunculan kata kunci dari masing-masing departemen.
+Pelabelan awal dilakukan secara rule-based menggunakan keyword matching. Setiap departemen memiliki daftar kata kunci yang mengacu pada Struktur Organisasi OJK-Wide. Dokumen diklasifikasikan berdasarkan skor kemunculan kata kunci, dengan frasa yang lebih panjang diberi bobot lebih tinggi untuk mengurangi ambiguitas.
 
 ### Model
 
-Beberapa model dibandingkan melalui cross-validation:
-
-| Model | Akurasi CV (5-fold) |
-|---|---|
-| Multinomial Naive Bayes | 81.0% |
-| Logistic Regression | 83.3% |
-| Linear SVC | 85.0% |
-| Random Forest | 78.3% |
-| **SGD Classifier** | **88.6%** |
-
-Model terbaik menggunakan konfigurasi:
-- **Vectorizer**: TfidfVectorizer, max_features=10000, ngram_range=(1,3), sublinear_tf=True
-- **Classifier**: SGDClassifier, loss=modified_huber, alpha=0.0001, max_iter=5000
-- Hyperparameter dituning menggunakan GridSearchCV dengan StratifiedKFold
+Model yang digunakan adalah Multinomial Naive Bayes dengan TF-IDF vectorizer. Konfigurasi:
+- **Vectorizer**: TfidfVectorizer, max_features=5000, ngram_range=(1,2), sublinear_tf=True
+- **Classifier**: MultinomialNB, alpha=0.1
+- Cross-validation 5-fold menghasilkan akurasi rata-rata sekitar 83.9%
 
 ### Dataset
 
 - 43 dokumen POJK dari tahun 2024-2025
-- Distribusi label: Perbankan (15), Pasar Modal (15), IKNB (8), ITSK (5)
+- Distribusi label: Perbankan (16), Pasar Modal (13), ITSK (5), Perasuransian (4), PPEP (3), Lembaga Pembiayaan (2)
 
 ## Cara Penggunaan
 
@@ -159,7 +151,7 @@ vercel --prod
 | Package | Versi | Fungsi |
 |---|---|---|
 | flask | 3.1.1 | Web framework |
-| scikit-learn | 1.8.0 | TF-IDF, SGD Classifier, evaluasi model |
+| scikit-learn | 1.8.0 | TF-IDF, Naive Bayes, evaluasi model |
 | joblib | 1.5.1 | Serialisasi model |
 | pdfplumber | - | Ekstraksi teks dari PDF |
 | pandas | - | Manipulasi data |

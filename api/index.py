@@ -18,24 +18,34 @@ model = joblib.load(MODEL_PATH)
 
 DEPT_INFO = {
     "Perbankan": {
-        "icon": "🏦",
-        "color": "#2196F3",
-        "description": "Mengawasi dan mengatur industri perbankan, termasuk bank umum, BPR, dan bank syariah.",
+        "icon": "BNK",
+        "color": "#1565C0",
+        "description": "Pengawasan bank umum, BPR, BPRS, bank syariah, dan unit usaha syariah.",
     },
     "Pasar Modal": {
-        "icon": "📈",
-        "color": "#FF9800",
-        "description": "Mengawasi pasar modal, termasuk saham, obligasi, reksa dana, dan perusahaan efek.",
+        "icon": "PM",
+        "color": "#E65100",
+        "description": "Pengawasan pasar modal, keuangan derivatif, dan bursa karbon.",
     },
-    "IKNB": {
-        "icon": "🛡️",
-        "color": "#4CAF50",
-        "description": "Mengawasi industri keuangan non-bank: asuransi, dana pensiun, lembaga pembiayaan.",
+    "Perasuransian": {
+        "icon": "ASR",
+        "color": "#2E7D32",
+        "description": "Pengawasan perasuransian, penjaminan, dan dana pensiun.",
+    },
+    "Lembaga Pembiayaan": {
+        "icon": "LP",
+        "color": "#6A1B9A",
+        "description": "Pengawasan lembaga pembiayaan, perusahaan modal ventura, LKM, dan LJK lainnya.",
     },
     "ITSK": {
-        "icon": "💻",
-        "color": "#E91E63",
-        "description": "Mengawasi inovasi teknologi sektor keuangan, fintech, dan layanan digital.",
+        "icon": "IT",
+        "color": "#C62828",
+        "description": "Pengawasan inovasi teknologi sektor keuangan, aset keuangan digital, dan aset kripto.",
+    },
+    "PPEP": {
+        "icon": "PP",
+        "color": "#00838F",
+        "description": "Pengawasan perilaku pelaku usaha jasa keuangan, edukasi, dan pelindungan konsumen.",
     },
 }
 
