@@ -15,3 +15,9 @@ venv/
 # OS
 Thumbs.db
 .DS_Store
+
+# Data files (too large for git / not needed for deploy)
+docs_POJK/
+output_pojk.csv
+output_pojk_classified.csv
+*.ipynb
