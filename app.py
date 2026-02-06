@@ -4,13 +4,17 @@ import re
 import joblib
 from flask import Flask, render_template, request
 
+"""
+Flask application untuk klasifikasi pengaduan OJK.
+Memuat model yang sudah di-training dan menyajikan antarmuka web
+untuk menerima input teks dan menampilkan hasil prediksi departemen.
+"""
+
 app = Flask(__name__)
 
-# ── Load model once at startup ────────────────────────────────────────────────
 MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model_klasifikasi_ojk.joblib")
 model = joblib.load(MODEL_PATH)
 
-# Department metadata for the result card
 DEPT_INFO = {
     "Perbankan": {
         "icon": "🏦",
@@ -36,7 +40,7 @@ DEPT_INFO = {
 
 
 def clean_text(text: str) -> str:
-    """Clean input text (remove numbers & special chars)."""
+    """Hapus angka dan karakter khusus, sisakan huruf dan spasi."""
     text = re.sub(r"\d+", "", text)
     text = re.sub(r"[^a-zA-Z\s]", "", text)
     text = re.sub(r"\s+", " ", text)
@@ -57,7 +61,6 @@ def index():
             prediction = model.predict([cleaned])[0]
             dept_info = DEPT_INFO.get(prediction, {})
 
-            # Get prediction probabilities if available
             if hasattr(model, "predict_proba"):
                 proba = model.predict_proba([cleaned])[0]
                 confidence = round(max(proba) * 100, 1)

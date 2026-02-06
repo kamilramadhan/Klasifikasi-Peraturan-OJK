@@ -5,18 +5,18 @@ import pdfplumber
 
 
 def clean_text(text: str) -> str:
-    """Remove numbers and special characters, keeping only letters and spaces."""
-    # Remove numbers
+    """Hapus angka dan karakter khusus, sisakan huruf dan spasi."""
+    # Hapus angka
     text = re.sub(r"\d+", "", text)
-    # Remove special characters (keep only letters and whitespace)
+    # Hapus karakter khusus
     text = re.sub(r"[^a-zA-Z\s]", "", text)
-    # Collapse multiple whitespace into a single space
+    # Gabungkan spasi berlebih
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
 
 def extract_text_from_pdf(pdf_path: str) -> str:
-    """Extract all text from a PDF file using pdfplumber."""
+    """Ekstrak seluruh teks dari file PDF menggunakan pdfplumber."""
     full_text = []
     with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
@@ -45,7 +45,7 @@ def main():
             cleaned = clean_text(raw_text)
             rows.append({"filename": filename, "content": cleaned})
         except Exception as e:
-            print(f"  ⚠ Error processing {filename}: {e}")
+            print(f"  Error processing {filename}: {e}")
             rows.append({"filename": filename, "content": ""})
 
     with open(output_csv, "w", newline="", encoding="utf-8") as csvfile:

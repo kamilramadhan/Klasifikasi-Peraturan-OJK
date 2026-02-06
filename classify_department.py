@@ -7,10 +7,10 @@ csv.field_size_limit(sys.maxsize)
 
 
 def classify_department(text: str) -> str:
-    """Classify OJK regulation into a department based on keyword matching."""
+    """Klasifikasikan peraturan OJK ke departemen berdasarkan keyword matching."""
     text_lower = text.lower()
 
-    # Define keywords for each department
+    # Kata kunci per departemen
     departments = {
         "ITSK": [
             "teknologi", "fintech", "digital", "sandbox",
@@ -30,7 +30,7 @@ def classify_department(text: str) -> str:
         ],
     }
 
-    # Count keyword hits per department
+    # Hitung kemunculan keyword per departemen
     scores: dict[str, int] = {}
     for dept, keywords in departments.items():
         count = 0
@@ -38,7 +38,7 @@ def classify_department(text: str) -> str:
             count += len(re.findall(r"\b" + re.escape(kw) + r"\b", text_lower))
         scores[dept] = count
 
-    # Return department with highest score, or 'Lainnya' if no match
+    # Departemen dengan skor tertinggi
     best_dept = max(scores, key=scores.get)  # type: ignore[arg-type]
     if scores[best_dept] == 0:
         return "Lainnya"
@@ -58,14 +58,14 @@ def main():
             row["department"] = dept
             rows.append(row)
 
-    # Write output with new 'department' column
+    # Tulis output dengan kolom 'department'
     with open(output_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["filename", "content", "department"])
         writer.writeheader()
         writer.writerows(rows)
 
-    # Print summary
-    print(f"Classified {len(rows)} regulations → '{output_csv}'\n")
+    # Ringkasan
+    print(f"Classified {len(rows)} regulations -> '{output_csv}'\n")
     print(f"{'Department':<15} {'Count':>5}")
     print("-" * 22)
     dept_counts: dict[str, int] = {}
@@ -75,7 +75,7 @@ def main():
     for dept, count in sorted(dept_counts.items(), key=lambda x: -x[1]):
         print(f"{dept:<15} {count:>5}")
 
-    # Show per-file classification
+    # Klasifikasi per file
     print(f"\n{'No':<4} {'Filename':<75} {'Department'}")
     print("-" * 100)
     for i, row in enumerate(rows, 1):

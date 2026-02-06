@@ -4,8 +4,7 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual environments
-venv/
+# Virtual environment
 .venv/
 
 # Environment variables
@@ -13,11 +12,14 @@ venv/
 .env.*
 
 # OS
-Thumbs.db
 .DS_Store
+Thumbs.db
 
-# Data files (too large for git / not needed for deploy)
+# Data (tidak perlu di-track)
 docs_POJK/
 output_pojk.csv
 output_pojk_classified.csv
 *.ipynb
+
+# Vercel
+.vercel/

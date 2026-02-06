@@ -1,9 +1,8 @@
 """
-Text Classification Model for OJK Regulations
-================================================
-Uses TF-IDF Vectorizer + Multinomial Naive Bayes to predict the
-'Department' label (Perbankan, Pasar Modal, IKNB, ITSK) based on
-document content.
+Klasifikasi Teks Peraturan OJK
+Menggunakan TF-IDF Vectorizer dan Multinomial Naive Bayes untuk
+memprediksi label departemen (Perbankan, Pasar Modal, IKNB, ITSK)
+berdasarkan isi dokumen.
 """
 
 import csv
@@ -25,50 +24,42 @@ INPUT_CSV = os.path.join(BASE_DIR, "output_pojk_classified.csv")
 MODEL_PATH = os.path.join(BASE_DIR, "model_klasifikasi_ojk.joblib")
 
 
-# ── 1. Load Data ─────────────────────────────────────────────────────────────
-
 def load_data(csv_path: str) -> pd.DataFrame:
-    """Load the classified CSV into a DataFrame."""
+    """Muat CSV berlabel ke DataFrame."""
     df = pd.read_csv(csv_path, encoding="utf-8")
     print(f"Loaded {len(df)} documents from '{csv_path}'")
     print(f"\nLabel distribution:\n{df['department'].value_counts()}\n")
     return df
 
 
-# ── 2. Build Pipeline ────────────────────────────────────────────────────────
-
 def build_pipeline() -> Pipeline:
-    """Create a TF-IDF + Multinomial Naive Bayes pipeline."""
+    """Buat pipeline TF-IDF + Multinomial Naive Bayes."""
     pipeline = Pipeline([
         ("tfidf", TfidfVectorizer(
-            max_features=5000,       # top 5000 terms
-            ngram_range=(1, 2),      # unigrams + bigrams
-            sublinear_tf=True,       # apply log normalization
+            max_features=5000,
+            ngram_range=(1, 2),
+            sublinear_tf=True,
             min_df=1,
             max_df=0.95,
         )),
-        ("clf", MultinomialNB(alpha=0.1)),  # smoothing parameter
+        ("clf", MultinomialNB(alpha=0.1)),
     ])
     return pipeline
 
 
-# ── 3. Train & Evaluate ──────────────────────────────────────────────────────
-
 def train_and_evaluate(df: pd.DataFrame) -> Pipeline:
-    """Train the model, run cross-validation, and evaluate on a test split."""
+    """Training model, cross-validation, dan evaluasi pada test split."""
     X = df["content"]
     y = df["department"]
 
-    # ── Cross-validation (on full dataset, useful for small datasets) ────
     pipeline = build_pipeline()
     cv_scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
     print("=" * 60)
     print("5-Fold Cross-Validation")
     print("=" * 60)
     print(f"  Accuracy per fold : {cv_scores}")
-    print(f"  Mean accuracy     : {cv_scores.mean():.4f} ± {cv_scores.std():.4f}\n")
+    print(f"  Mean accuracy     : {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}\n")
 
-    # ── Train/Test split for detailed report ─────────────────────────────
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y,
     )
@@ -89,37 +80,30 @@ def train_and_evaluate(df: pd.DataFrame) -> Pipeline:
     print(cm_df)
     print()
 
-    # ── Re-train on full dataset for final model ─────────────────────────
-    print("Re-training on full dataset for final model...")
+    print("Training ulang pada seluruh dataset untuk model final...")
     final_pipeline = build_pipeline()
     final_pipeline.fit(X, y)
 
     return final_pipeline
 
 
-# ── 4. Save Model ────────────────────────────────────────────────────────────
-
 def save_model(pipeline: Pipeline, path: str) -> None:
-    """Save the trained pipeline (TF-IDF + NB) to disk using joblib."""
+    """Simpan pipeline ke disk menggunakan joblib."""
     joblib.dump(pipeline, path)
     print(f"Model saved to '{path}'")
 
 
-# ── 5. Load & Predict ────────────────────────────────────────────────────────
-
 def load_model(path: str) -> Pipeline:
-    """Load a previously saved model from disk."""
+    """Muat model dari disk."""
     pipeline = joblib.load(path)
     print(f"Model loaded from '{path}'")
     return pipeline
 
 
 def predict(pipeline: Pipeline, texts: list[str]) -> list[str]:
-    """Predict department labels for a list of texts."""
+    """Prediksi label departemen untuk daftar teks."""
     return pipeline.predict(texts).tolist()
 
-
-# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     # Load

@@ -4,15 +4,18 @@ import re
 import joblib
 from flask import Flask, render_template, request
 
-# ── Flask app with template folder pointing to project root ───────────────────
+"""
+Entry point serverless untuk deployment Vercel.
+Identik dengan app.py, dengan penyesuaian path karena file
+berada di subdirektori api/.
+"""
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
 
-# ── Load model once at startup ────────────────────────────────────────────────
 MODEL_PATH = os.path.join(BASE_DIR, "model_klasifikasi_ojk.joblib")
 model = joblib.load(MODEL_PATH)
 
-# Department metadata for the result card
 DEPT_INFO = {
     "Perbankan": {
         "icon": "🏦",
@@ -38,7 +41,7 @@ DEPT_INFO = {
 
 
 def clean_text(text: str) -> str:
-    """Clean input text (remove numbers & special chars)."""
+    """Hapus angka dan karakter khusus, sisakan huruf dan spasi."""
     text = re.sub(r"\d+", "", text)
     text = re.sub(r"[^a-zA-Z\s]", "", text)
     text = re.sub(r"\s+", " ", text)
@@ -59,7 +62,6 @@ def index():
             prediction = model.predict([cleaned])[0]
             dept_info = DEPT_INFO.get(prediction, {})
 
-            # Get prediction probabilities if available
             if hasattr(model, "predict_proba"):
                 proba = model.predict_proba([cleaned])[0]
                 confidence = round(max(proba) * 100, 1)
